@@ -12,6 +12,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+wasm-bindgen = "0.2.88" # or a newer version like "0.2.92"
 futures = "0.3"
 bytemuck = { version = "1.9.1", features = ["derive"] }
 winit = "0.28"
