@@ -18,5 +18,15 @@ jobs:
         run: yarn install --frozen-lockfile
 
       # Option A: Run in background (for simple tasks)
-      - name: Start server in background
-        run: yarn start &
+      - name: Build project
+        run: yarn build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./build # or ./dist depending on your framework
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
