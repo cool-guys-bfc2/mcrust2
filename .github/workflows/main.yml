@@ -1,12 +1,30 @@
-name: CI
-on: [push]
+name: Build and Deploy Minecrust
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Install Rust and WASM Target
+        # DevOps Tip: Lock your toolchain versions for build consistency
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build Rust WASM (Fixes TS7016)
+        # This step generates the '../pkg/index' files TypeScript is looking for
+        run: wasm-pack build --target web
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -14,18 +32,15 @@ jobs:
           node-version: '20'
           cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Build WASM package
-        # This generates the ../pkg folder with the .d.ts files
+      - name: Install JS Deps and Build Frontend
+        # Using the '|' block prevents 'unexpected newline' shell errors
         run: |
-         wasm-pack build
+          yarn install --frozen-lockfile
+          yarn build
 
-      - name: Install JS dependencies
-        run: yarn install
-
-      - name: Run Build
-        run: yarn build
-
-
+      - name: Deploy to GitHub Pages
+        # Automation: Automatically push the 'dist' or 'build' folder to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist # Verify if minecrust builds to 'dist' or 'build'
+          branch: gh-pages
