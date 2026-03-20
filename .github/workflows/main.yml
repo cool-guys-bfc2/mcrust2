@@ -16,8 +16,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io -sSf | sh
 
       - name: Build WASM package
         # This generates the ../pkg folder with the .d.ts files
