@@ -21,7 +21,8 @@ jobs:
 
       - name: Build WASM package
         # This generates the ../pkg folder with the .d.ts files
-        run: wasm-pack build 
+        run: |
+         wasm-pack build
 
       - name: Install JS dependencies
         run: yarn install
